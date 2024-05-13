@@ -1,13 +1,29 @@
-package main
+package api
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
 
-func main() {
-	r := gin.Default()
+	"github.com/gin-gonic/gin"
+)
 
-	r.GET("/ping", func(c *gin.Context) {
+var (
+	app *gin.Engine
+)
+
+func iniRoute(r *gin.RouterGroup) {
+	r.GET("/hello", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"message": "pong",
+			"message": "I'm in Vercel",
 		})
 	})
+}
+
+func init() {
+	app = gin.New()
+	r := app.Group("/api")
+	iniRoute(r)
+}
+
+func Handler(w http.ResponseWriter, r *http.Request) {
+	app.ServeHTTP(w, r)
 }
