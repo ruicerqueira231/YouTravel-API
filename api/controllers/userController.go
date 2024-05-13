@@ -48,6 +48,11 @@ func Signup(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{})
 }
+
+func SignupAPI(r *gin.RouterGroup) {
+	r.POST("/signup", Signup)
+}
+
 func Login(c *gin.Context) {
 	var body struct {
 		Email    string
