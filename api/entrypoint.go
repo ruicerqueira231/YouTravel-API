@@ -27,7 +27,7 @@ func init() {
 	app = gin.New()
 	r := app.Group("/api")
 	iniRoute(r)
-	controllers.SignupAPI(r)
+	r.POST("/signup", controllers.Signup)
 	r.POST("/login", controllers.Login)
 	r.GET("/validate", middleware.RequireAuth, controllers.Validate)
 	controllers.Message(r)

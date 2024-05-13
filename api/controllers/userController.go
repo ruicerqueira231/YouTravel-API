@@ -55,62 +55,51 @@ func Signup(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})
 }
 
-func SignupAPI(r *gin.RouterGroup) {
-	r.POST("/signup", Signup)
-}
-
 func Login(c *gin.Context) {
 	var body struct {
 		Email    string
 		Password string
 	}
 
-	if c.Bind(&body) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to read body",
-		})
+	if err := c.Bind(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read body"})
 		return
 	}
 
-	// Look for user requested
+	// Look for the user in the database
 	var user models.User
 	initialzers.DB.First(&user, "email = ?", body.Email)
-
 	if user.ID == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid email or password",
-		})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email or password"})
 		return
 	}
+
+	// Compare the password
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
-
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid Password",
-		})
-
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Password"})
 		return
 	}
 
-	//Generating token
-
+	// Generate a token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": user.ID,
 		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
 	})
 	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
-
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to create token",
-		})
-
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to create token"})
 		return
 	}
 
+	isProduction := os.Getenv("ENV") == "production"
+	secure := isProduction
+	httpOnly := true
+
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true)
-	c.JSON(http.StatusOK, gin.H{})
+	c.SetCookie("Authorization", tokenString, 3600*24*30, "/", "", secure, httpOnly)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Login successful"})
 }
 
 func Validate(c *gin.Context) {
