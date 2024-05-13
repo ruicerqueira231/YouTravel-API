@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 	"youtravel-api/api/controllers"
+	initialzers "youtravel-api/api/initializers"
 	"youtravel-api/api/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -21,6 +22,8 @@ func iniRoute(r *gin.RouterGroup) {
 }
 
 func init() {
+	initialzers.ConnectToDb()
+	initialzers.SyncDatabase()
 	app = gin.New()
 	r := app.Group("/api")
 	iniRoute(r)
