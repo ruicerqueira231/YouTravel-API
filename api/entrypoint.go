@@ -2,6 +2,8 @@ package api
 
 import (
 	"net/http"
+	"youtravel-api/api/controllers"
+	"youtravel-api/api/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,6 +24,10 @@ func init() {
 	app = gin.New()
 	r := app.Group("/api")
 	iniRoute(r)
+	r.POST("/signup", controllers.Signup)
+	r.POST("/login", controllers.Login)
+	r.GET("/validate", middleware.RequireAuth, controllers.Validate)
+	r.POST("/logout", middleware.RequireAuth, controllers.Logout)
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
