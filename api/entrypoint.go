@@ -22,7 +22,7 @@ func iniRoute(r *gin.RouterGroup) {
 }
 
 func init() {
-	initialzers.ConnectToDb()
+	initialzers.ConnectToDB()
 	initialzers.SyncDatabase()
 	app = gin.New()
 	r := app.Group("/api")
