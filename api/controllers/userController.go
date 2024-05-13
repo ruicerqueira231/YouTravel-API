@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -36,6 +37,11 @@ func Signup(c *gin.Context) {
 	}
 
 	user := models.User{Email: body.Email, Password: string(hash)}
+
+	if initialzers.DB == nil {
+		log.Fatal("Database connection is not initialized")
+	}
+
 	result := initialzers.DB.Create(&user)
 
 	if result.Error != nil {
