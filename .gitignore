@@ -29,5 +29,9 @@ go.work.sum
 .vscode/
 *.sublime-workspace
 
-# .gitignore content
+# Ignore main.go if it's for local development (you might want to adjust this)
 main.go
+
+# Local development files
+/api/initializers/connectToLocalDatabase.go
+/api/initializers/syncDatabaseLocal.go
