@@ -16,8 +16,13 @@ import (
 func Signup(c *gin.Context) {
 
 	var body struct {
-		Email    string
-		Password string
+		Nome        string `json:"nome"`
+		Username    string `json:"username"`
+		Email       string `json:"email"`
+		Photo       string `json:"photo"`
+		Password    string `json:"password"`
+		Age         int    `json:"age"`
+		Nationality string `json:"nationality"`
 	}
 
 	if c.Bind(&body) != nil {
@@ -36,7 +41,15 @@ func Signup(c *gin.Context) {
 		})
 	}
 
-	user := models.User{Email: body.Email, Password: string(hash)}
+	user := models.User{
+		Nome:        body.Nome,
+		Username:    body.Username,
+		Email:       body.Email,
+		Photo:       body.Photo,
+		Password:    string(hash),
+		Age:         body.Age,
+		Nationality: body.Nationality,
+	}
 
 	if initialzers.DB == nil {
 		log.Fatal("Database connection is not initialized")
@@ -52,7 +65,7 @@ func Signup(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{})
+	c.JSON(http.StatusOK, user)
 }
 
 func Login(c *gin.Context) {
