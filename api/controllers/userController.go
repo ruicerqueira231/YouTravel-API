@@ -129,10 +129,17 @@ func Logout(c *gin.Context) {
 	})
 }
 
-func Message(r *gin.RouterGroup) {
-	r.GET("/message", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "Meesage from another folder",
+func GetAllUsers(c *gin.Context) {
+
+	var users []models.User
+
+	result := initialzers.DBLocal.First(&users)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to fetch users",
 		})
-	})
+		return
+	}
+
+	c.JSON(http.StatusOK, users)
 }

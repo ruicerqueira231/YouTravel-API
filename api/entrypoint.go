@@ -30,8 +30,8 @@ func init() {
 	r.POST("/signup", controllers.Signup)
 	r.POST("/login", controllers.Login)
 	r.GET("/validate", middleware.RequireAuth, controllers.Validate)
-	controllers.Message(r)
 	r.POST("/logout", middleware.RequireAuth, controllers.Logout)
+	r.GET("/getUsers", controllers.GetAllUsers)
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
