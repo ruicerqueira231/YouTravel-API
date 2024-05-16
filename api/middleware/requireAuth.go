@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 	"time"
-	initialzers "youtravel-api/api/initializers"
+	initializers "youtravel-api/api/initializers"
 	"youtravel-api/api/models"
 
 	"github.com/gin-gonic/gin"
@@ -14,35 +14,50 @@ import (
 
 func RequireAuth(c *gin.Context) {
 	tokenString, err := c.Cookie("Authorization")
-
 	if err != nil {
-		c.AbortWithStatus(http.StatusUnauthorized)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "No authorization cookie provided"})
+		c.Abort()
+		return
 	}
-	c.Next()
 
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-
 		return []byte(os.Getenv("SECRET_KEY")), nil
 	})
-
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		if float64(time.Now().Unix()) > claims["exp"].(float64) {
-			c.AbortWithStatus(http.StatusUnauthorized)
-		}
-
-		var user models.User
-		initialzers.DB.First(&user, claims["sub"])
-		if user.ID == 0 {
-			c.AbortWithStatus(http.StatusBadRequest)
-		}
-
-		c.Set("user", user)
-
-		c.Next()
-	} else {
-		c.AbortWithStatus(http.StatusUnauthorized)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		c.Abort()
+		return
 	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
+		c.Abort()
+		return
+	}
+
+	if float64(time.Now().Unix()) > claims["exp"].(float64) {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token has expired"})
+		c.Abort()
+		return
+	}
+
+	var user models.User
+	if err := initializers.DB.First(&user, claims["sub"]).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
+		c.Abort()
+		return
+	}
+
+	if user.ID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid user ID"})
+		c.Abort()
+		return
+	}
+
+	c.Set("user", user)
+	c.Next()
 }

@@ -22,11 +22,17 @@ func iniRoute(r *gin.RouterGroup) {
 }
 
 func init() {
+	//initializers
 	initialzers.ConnectToDB()
 	initialzers.SyncDatabase()
+	initialzers.InitCategories(initialzers.DB)
+
+	//routes
 	app = gin.New()
 	r := app.Group("/api")
 	iniRoute(r)
+
+	//User routes
 	r.POST("/signup", controllers.Signup)
 	r.POST("/login", controllers.Login)
 	r.GET("/validate", middleware.RequireAuth, controllers.Validate)
