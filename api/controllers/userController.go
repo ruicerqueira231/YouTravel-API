@@ -151,7 +151,7 @@ func GetUserById(c *gin.Context) {
 
 	var user models.User
 
-	if err := initialzers.DBLocal.First(&user, id).Error; err != nil {
+	if err := initialzers.DB.First(&user, id).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusNotFound, gin.H{
 				"error": "User not found",
@@ -159,6 +159,66 @@ func GetUserById(c *gin.Context) {
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": "Failed to fech user",
+			})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
+
+func GetUserByEmail(c *gin.Context) {
+
+	var body struct {
+		Email string `json:"email"`
+	}
+
+	// Bind the request body to the struct
+	if err := c.BindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	var user models.User
+
+	if err := initialzers.DB.Where("email = ?", body.Email).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"error": "User not found",
+			})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Failed to fetch user",
+			})
+		}
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
+
+func GetUserByUsername(c *gin.Context) {
+
+	var body struct {
+		Username string `json:"username"`
+	}
+
+	// Bind the request body to the struct
+	if err := c.BindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	var user models.User
+
+	if err := initialzers.DB.Where("username = ?", body.Username).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"error": "User not found",
+			})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Failed to fetch user",
 			})
 		}
 		return

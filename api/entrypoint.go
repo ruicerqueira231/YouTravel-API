@@ -39,6 +39,8 @@ func init() {
 	r.POST("/logout", middleware.RequireAuth, controllers.Logout)
 	r.GET("/getUsers", controllers.GetAllUsers)
 	r.GET("/getUserById/:id", controllers.GetUserById)
+	r.GET("/getUserByEmail", controllers.GetUserByEmail)
+	r.GET("/getUserByUsername", controllers.GetUserByUsername)
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
