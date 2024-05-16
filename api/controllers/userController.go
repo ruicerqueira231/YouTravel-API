@@ -133,7 +133,7 @@ func GetAllUsers(c *gin.Context) {
 
 	var users []models.User
 
-	result := initialzers.DB.First(&users)
+	result := initialzers.DB.Find(&users)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to fetch users",
