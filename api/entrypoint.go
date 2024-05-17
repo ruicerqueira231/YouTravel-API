@@ -23,6 +23,8 @@ func iniRoute(r *gin.RouterGroup) {
 
 func init() {
 	//initializers
+	initialzers.LoadEnvVariables()
+
 	initialzers.ConnectToDB()
 	initialzers.SyncDatabase()
 	initialzers.InitCategories(initialzers.DB)
@@ -37,10 +39,13 @@ func init() {
 	r.POST("/login", controllers.Login)
 	r.GET("/validate", middleware.RequireAuth, controllers.Validate)
 	r.POST("/logout", middleware.RequireAuth, controllers.Logout)
-	r.GET("/getUsers", controllers.GetAllUsers)
-	r.GET("/getUserById/:id", controllers.GetUserById)
-	r.GET("/getUserByEmail", controllers.GetUserByEmail)
-	r.GET("/getUserByUsername", controllers.GetUserByUsername)
+	r.GET("/users", controllers.GetAllUsers)
+	r.GET("/user/:id", controllers.GetUserById)
+	r.GET("/userByEmail", controllers.GetUserByEmail)
+	r.GET("/userByUsername", controllers.GetUserByUsername)
+
+	r.POST("/travel", controllers.CreateTravel)
+	r.GET("/travels", controllers.GetAllTravels)
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
