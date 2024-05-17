@@ -75,3 +75,21 @@ func GetTravelById(c *gin.Context) {
 
 	c.JSON(http.StatusOK, travel)
 }
+
+func GetTravelsByRating(c *gin.Context) {
+	rating := c.Query("rating")
+	if rating == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Rating parameter is required"})
+		return
+	}
+
+	var travels []models.Travel
+
+	result := initialzers.DB.Where("rating = ?", rating).Find(&travels)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch travels"})
+		return
+	}
+
+	c.JSON(http.StatusOK, travels)
+}

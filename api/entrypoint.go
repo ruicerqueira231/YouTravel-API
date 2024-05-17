@@ -44,9 +44,14 @@ func init() {
 	r.GET("/userByEmail", controllers.GetUserByEmail)
 	r.GET("/userByUsername", controllers.GetUserByUsername)
 
+	//travels routes
 	r.POST("/travel", controllers.CreateTravel)
 	r.GET("/travels", controllers.GetAllTravels)
 	r.GET("/travel/:id", controllers.GetTravelById)
+	r.GET("/travelByRating", controllers.GetTravelsByRating)
+
+	//invite routes
+	r.POST("/invite", controllers.CreateInvite)
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {

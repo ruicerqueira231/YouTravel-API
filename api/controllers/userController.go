@@ -173,7 +173,6 @@ func GetUserByEmail(c *gin.Context) {
 		Email string `json:"email"`
 	}
 
-	// Bind the request body to the struct
 	if err := c.BindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
@@ -223,6 +222,5 @@ func GetUserByUsername(c *gin.Context) {
 		}
 		return
 	}
-
 	c.JSON(http.StatusOK, user)
 }
