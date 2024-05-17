@@ -6,6 +6,7 @@ import (
 	"youtravel-api/api/models"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func CreateTravel(c *gin.Context) {
@@ -53,4 +54,24 @@ func GetAllTravels(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, travels)
+}
+
+func GetTravelById(c *gin.Context) {
+	id := c.Param("id")
+	var travel models.Travel
+
+	result := initialzers.DB.First(&travel, id)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusNotFound, gin.H{
+				"error": "Travel Not Found!",
+			})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Failed to fetch data",
+			})
+		}
+	}
+
+	c.JSON(http.StatusOK, travel)
 }
