@@ -46,6 +46,7 @@ func init() {
 
 	r.POST("/travel", controllers.CreateTravel)
 	r.GET("/travels", controllers.GetAllTravels)
+	r.GET("/travel/:id", controllers.GetTravelById)
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
