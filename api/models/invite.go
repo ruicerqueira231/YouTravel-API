@@ -4,9 +4,9 @@ import "gorm.io/gorm"
 
 type Invite struct {
 	gorm.Model
-	UserIDInviter uint
-	UserIDInvited uint
-	TravelID      uint
+	UserIDInviter uint `json:"user_id_inviter"`
+	UserIDInvited uint `json:"user_id_invited"`
+	TravelID      uint `json:"travel_id"`
 	Status        string
 	Date          string
 	Inviter       User   `gorm:"foreignKey:UserIDInviter;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`

@@ -19,7 +19,6 @@ func CreateInvite(c *gin.Context) {
 		return
 	}
 
-	// Log the received IDs
 	log.Printf("UserIDInviter: %d, UserIDInvited: %d\n", invite.UserIDInviter, invite.UserIDInvited)
 
 	if invite.UserIDInviter == invite.UserIDInvited {
