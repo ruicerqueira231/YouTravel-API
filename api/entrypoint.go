@@ -12,7 +12,6 @@ var (
 	app *gin.Engine
 )
 
-
 func init() {
 	//initializers
 	initialzers.LoadEnvVariables()

@@ -1,17 +1,16 @@
 package controllers
 
 import (
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 	"log"
 	"net/http"
 	"os"
 	"time"
 	initialzers "youtravel-api/api/initializers"
 	"youtravel-api/api/models"
-
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
-	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
 
 func Signup(c *gin.Context) {
@@ -66,7 +65,9 @@ func Signup(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, gin.H{
+		"message": "User created successfully",
+	})
 }
 
 func Login(c *gin.Context) {

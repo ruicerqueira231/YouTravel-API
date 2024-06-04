@@ -35,3 +35,6 @@ main.go
 # Local development files
 /api/initializers/connectToLocalDatabase.go
 /api/initializers/syncDatabaseLocal.go
+
+index.html
+
