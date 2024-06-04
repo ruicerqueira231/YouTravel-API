@@ -14,7 +14,6 @@ import (
 )
 
 func Signup(c *gin.Context) {
-
 	var body struct {
 		Nome        string `json:"nome"`
 		Username    string `json:"username"`
@@ -25,20 +24,19 @@ func Signup(c *gin.Context) {
 		Nationality string `json:"nationality"`
 	}
 
-	if c.Bind(&body) != nil {
+	if err := c.Bind(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Failed to read body",
 		})
-
 		return
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), 10)
-
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Failed to hash the password",
 		})
+		return // Don't forget to add this return statement to prevent further execution
 	}
 
 	user := models.User{
@@ -53,20 +51,20 @@ func Signup(c *gin.Context) {
 
 	if initialzers.DB == nil {
 		log.Fatal("Database connection is not initialized")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database is not initialized"})
+		return
 	}
 
 	result := initialzers.DB.Create(&user)
-
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Failed to create user",
 		})
-
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": user,
+		"message": "User created successfully",
 	})
 }
 
