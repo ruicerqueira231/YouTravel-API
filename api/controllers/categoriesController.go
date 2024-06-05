@@ -10,7 +10,7 @@ import (
 func GetAllCategories(c *gin.Context) {
 	var categories []models.Category
 
-	result := initializers.DB.First(&categories)
+	result := initializers.DB.Find(&categories)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to fetch categories",
