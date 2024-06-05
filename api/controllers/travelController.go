@@ -39,15 +39,7 @@ func CreateTravel(c *gin.Context) {
 		})
 	}
 
-	response := models.Travel{
-		UserIDAdmin: travel.UserIDAdmin,
-		CategoryID:  travel.CategoryID,
-		Description: travel.Description,
-		Date:        travel.Date,
-		Rating:      travel.Rating,
-	}
-
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, travel)
 }
 
 func GetAllTravels(c *gin.Context) {

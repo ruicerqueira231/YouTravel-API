@@ -27,6 +27,7 @@ func init() {
 	routes.UserRoutes(r)
 	routes.TravelRoutes(r)
 	routes.InviteRoutes(r)
+	routes.CategoriesRoutes(r)
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {
