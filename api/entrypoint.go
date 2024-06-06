@@ -19,6 +19,7 @@ func init() {
 	initialzers.ConnectToDB()
 	initialzers.SyncDatabase()
 	initialzers.InitCategories(initialzers.DB)
+	initialzers.InitLocationCategories(initialzers.DB)
 
 	app = gin.New()
 	r := app.Group("/api")
@@ -28,6 +29,7 @@ func init() {
 	routes.TravelRoutes(r)
 	routes.InviteRoutes(r)
 	routes.CategoriesRoutes(r)
+	routes.LocationRoutes(r)
 }
 
 func Handler(w http.ResponseWriter, r *http.Request) {

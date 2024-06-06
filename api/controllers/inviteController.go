@@ -37,3 +37,7 @@ func CreateInvite(c *gin.Context) {
 
 	c.JSON(http.StatusOK, invite)
 }
+
+func ChangeStatusInvited(c *gin.Context) {
+
+}
