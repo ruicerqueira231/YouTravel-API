@@ -16,4 +16,6 @@ func UserRoutes(r *gin.RouterGroup) {
 	r.GET("/user/:id", controllers.GetUserById)
 	r.GET("/userByEmail", controllers.GetUserByEmail)
 	r.GET("/userByUsername", controllers.GetUserByUsername)
+	r.PUT("/user/:id", controllers.UpdateUser)
+	r.GET("/userImage/:id", controllers.GetUserImage)
 }

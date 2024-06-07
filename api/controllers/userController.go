@@ -1,6 +1,10 @@
 package controllers
 
 import (
+	"context"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -36,7 +40,12 @@ func Signup(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Failed to hash the password",
 		})
-		return // Don't forget to add this return statement to prevent further execution
+		return
+	}
+
+	defaultImage := "default_image.png"
+	if body.Photo == "" {
+		body.Photo = defaultImage
 	}
 
 	user := models.User{
@@ -201,7 +210,6 @@ func GetUserByUsername(c *gin.Context) {
 		Username string `json:"username"`
 	}
 
-	// Bind the request body to the struct
 	if err := c.BindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
@@ -222,4 +230,111 @@ func GetUserByUsername(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, user)
+}
+
+func UpdateUser(c *gin.Context) {
+	userID := c.Param("id")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing user ID"})
+		return
+	}
+
+	var body struct {
+		Nome        *string `json:"nome,omitempty"`
+		Username    *string `json:"username,omitempty"`
+		Email       *string `json:"email,omitempty"`
+		Photo       *string `json:"photo,omitempty"`
+		Password    *string `json:"password,omitempty"`
+		Age         *int    `json:"age,omitempty"`
+		Nationality *string `json:"nationality,omitempty"`
+	}
+
+	if err := c.BindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	var user models.User
+	result := initialzers.DB.First(&user, userID)
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	if body.Nome != nil {
+		user.Nome = *body.Nome
+	}
+	if body.Username != nil {
+		user.Username = *body.Username
+	}
+	if body.Email != nil {
+		user.Email = *body.Email
+	}
+	if body.Photo != nil {
+		user.Photo = *body.Photo
+	}
+	if body.Password != nil {
+		hash, err := bcrypt.GenerateFromPassword([]byte(*body.Password), 10)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to hash the password"})
+			return
+		}
+		user.Password = string(hash)
+	}
+	if body.Age != nil {
+		user.Age = *body.Age
+	}
+	if body.Nationality != nil {
+		user.Nationality = *body.Nationality
+	}
+
+	if result = initialzers.DB.Save(&user); result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
+
+func GetUserImage(c *gin.Context) {
+	userID := c.Param("id")
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing user ID"})
+		return
+	}
+
+	var user models.User
+	result := initialzers.DB.First(&user, userID)
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	if user.Photo == "" {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No photo available for this user"})
+		return
+	}
+
+	cfg, err := config.LoadDefaultConfig(context.TODO())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load AWS config"})
+		return
+	}
+
+	client := s3.NewFromConfig(cfg)
+	resp, err := client.GetObject(context.TODO(), &s3.GetObjectInput{
+		Bucket: aws.String("you-travel-storage"),
+		Key:    aws.String(user.Photo),
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve file from S3"})
+		return
+	}
+	defer resp.Body.Close()
+
+	contentType := "application/octet-stream"
+	if resp.ContentType != nil {
+		contentType = *resp.ContentType
+	}
+	c.DataFromReader(http.StatusOK, *resp.ContentLength, contentType, resp.Body, nil)
 }
