@@ -38,6 +38,98 @@ func CreateInvite(c *gin.Context) {
 	c.JSON(http.StatusOK, invite)
 }
 
-func ChangeStatusInvited(c *gin.Context) {
+func GetInviteByID(c *gin.Context) {
+	var invite models.Invite
+	inviteID := c.Param("id") // Assuming the ID is passed as a URL parameter
 
+	// Query the database for the invite with the given ID
+	if err := initializers.DB.First(&invite, inviteID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Invite not found",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, invite)
+}
+
+func ChangeStatusAcceptedInvited(c *gin.Context) {
+	id := c.Param("id")
+
+	var invite models.Invite
+	if err := initializers.DB.First(&invite, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Invite not found",
+		})
+		return
+	}
+
+	if invite.Status == "accepted" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invite is already accepted",
+		})
+		return
+	}
+
+	invite.Status = "accepted"
+
+	if err := initializers.DB.Save(&invite).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to update status",
+		})
+		return
+	}
+
+	if err := CreateParticipation(invite); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to create participation record",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, invite)
+
+}
+
+func CreateParticipation(invite models.Invite) error {
+	participation := models.Participation{
+		UserID:   invite.UserIDInvited,
+		TravelID: invite.TravelID,
+	}
+
+	if err := initializers.DB.Create(&participation).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ChangeStatusDeclinedInvited(c *gin.Context) {
+	id := c.Param("id")
+
+	var invite models.Invite
+	if err := initializers.DB.First(&invite, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Invite not found",
+		})
+		return
+	}
+
+	if invite.Status == "declined" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invite is already declined",
+		})
+		return
+	}
+
+	invite.Status = "declined"
+
+	if err := initializers.DB.Save(&invite).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to update status",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, invite)
 }

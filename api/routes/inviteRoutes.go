@@ -8,4 +8,6 @@ import (
 
 func InviteRoutes(r *gin.RouterGroup) {
 	r.POST("/invite", controllers.CreateInvite)
+	r.POST("/invite/changeStatusToAccepted/:id", controllers.ChangeStatusAcceptedInvited)
+	r.POST("/invite/changeStatusToDeclined/:id", controllers.ChangeStatusDeclinedInvited)
 }

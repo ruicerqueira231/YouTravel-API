@@ -39,6 +39,17 @@ func CreateTravel(c *gin.Context) {
 		})
 	}
 
+	participation := models.Participation{
+		UserID:   body.UserIDAdmin,
+		TravelID: travel.ID,
+	}
+
+	if err := initialzers.DB.Create(&participation).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to create participation for admin",
+		})
+	}
+
 	c.JSON(http.StatusOK, travel)
 }
 
