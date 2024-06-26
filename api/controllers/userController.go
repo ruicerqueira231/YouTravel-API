@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -327,7 +328,8 @@ func GetUserImage(c *gin.Context) {
 		Key:    aws.String(user.Photo),
 	})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve file from S3"})
+		log.Printf("Failed to retrieve file from S3: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to retrieve file from S3: %v", err)})
 		return
 	}
 	defer resp.Body.Close()

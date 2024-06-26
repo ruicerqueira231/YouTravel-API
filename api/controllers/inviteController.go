@@ -40,7 +40,7 @@ func CreateInvite(c *gin.Context) {
 
 func GetInviteByID(c *gin.Context) {
 	var invite models.Invite
-	inviteID := c.Param("id") // Assuming the ID is passed as a URL parameter
+	inviteID := c.Param("id")
 
 	// Query the database for the invite with the given ID
 	if err := initializers.DB.First(&invite, inviteID).Error; err != nil {
