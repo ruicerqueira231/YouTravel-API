@@ -328,7 +328,6 @@ func GetUserImage(c *gin.Context) {
 		Key:    aws.String(user.Photo),
 	})
 	if err != nil {
-		log.Printf("Failed to retrieve file from S3: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to retrieve file from S3: %v", err)})
 		return
 	}
