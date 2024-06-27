@@ -1,7 +1,6 @@
 package initialzers
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -9,11 +8,11 @@ import (
 )
 
 func LoadEnvVariables() {
-	fmt.Println("Current ENV:", os.Getenv("ENV")) // Debug: Print the current environment
+	log.Printf("Current ENV: %s", os.Getenv("ENV"))
 	if os.Getenv("ENV") != "production" {
 		err := godotenv.Load()
 		if err != nil {
-			log.Fatal("Error loading .env file")
+			log.Fatalf("Error loading .env file: %v", err)
 		}
 	}
 }
