@@ -24,9 +24,21 @@ func ConnectToDB() {
 
 func connectToRemoteDB() {
 	host := os.Getenv("POSTGRES_HOST")
+	if host == "" {
+		host = "ep-small-fire-a202x97i-pooler.eu-central-1.aws.neon.tech"
+	}
 	user := os.Getenv("POSTGRES_USER")
+	if user == "" {
+		user = "default"
+	}
 	password := os.Getenv("POSTGRES_PASSWORD")
+	if password == "" {
+		password = "kZJGLz6Xwl4d"
+	}
 	dbname := os.Getenv("POSTGRES_DATABASE")
+	if dbname == "" {
+		dbname = "verceldb"
+	}
 	port := os.Getenv("POSTGRES_PORT")
 	if port == "" {
 		port = "5432"
