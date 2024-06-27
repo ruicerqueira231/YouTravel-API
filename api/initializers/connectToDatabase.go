@@ -13,7 +13,7 @@ var DB *gorm.DB
 
 func ConnectToDB() {
 	env := os.Getenv("ENV")
-	fmt.Printf("Running in %s environment\n", env) // Log environment
+	fmt.Printf("Running in %s environment\n", os.Getenv("ENV"))
 
 	if env == "local" {
 		connectToLocalDB()
