@@ -241,13 +241,10 @@ func UpdateUser(c *gin.Context) {
 	}
 
 	var body struct {
-		Nome        *string `json:"nome,omitempty"`
-		Username    *string `json:"username,omitempty"`
-		Email       *string `json:"email,omitempty"`
-		Photo       *string `json:"photo,omitempty"`
-		Password    *string `json:"password,omitempty"`
-		Age         *int    `json:"age,omitempty"`
-		Nationality *string `json:"nationality,omitempty"`
+		Nome     *string `json:"nome,omitempty"`
+		Username *string `json:"username,omitempty"`
+		Photo    *string `json:"photo,omitempty"`
+		Password *string `json:"password,omitempty"`
 	}
 
 	if err := c.BindJSON(&body); err != nil {
@@ -268,9 +265,7 @@ func UpdateUser(c *gin.Context) {
 	if body.Username != nil {
 		user.Username = *body.Username
 	}
-	if body.Email != nil {
-		user.Email = *body.Email
-	}
+
 	if body.Photo != nil {
 		user.Photo = *body.Photo
 	}
@@ -281,12 +276,6 @@ func UpdateUser(c *gin.Context) {
 			return
 		}
 		user.Password = string(hash)
-	}
-	if body.Age != nil {
-		user.Age = *body.Age
-	}
-	if body.Nationality != nil {
-		user.Nationality = *body.Nationality
 	}
 
 	if result = initialzers.DB.Save(&user); result.Error != nil {
