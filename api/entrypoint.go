@@ -14,6 +14,8 @@ var (
 
 func init() {
 
+	initialzers.LoadEnvVariables()
+
 	initialzers.ConnectToDB()
 	initialzers.SyncDatabase()
 	initialzers.InitCategories(initialzers.DB)
