@@ -16,7 +16,7 @@ var (
 
 func PrintAllEnvVariables() {
 	for _, env := range os.Environ() {
-		fmt.Println(env) // Prints "key=value"
+		fmt.Println(env)
 	}
 }
 
