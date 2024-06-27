@@ -13,8 +13,6 @@ var (
 )
 
 func init() {
-	//initializers
-	initialzers.LoadEnvVariables()
 
 	initialzers.ConnectToDB()
 	initialzers.SyncDatabase()

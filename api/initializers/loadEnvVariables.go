@@ -9,7 +9,7 @@ import (
 )
 
 func LoadEnvVariables() {
-	fmt.Println("Current ENV:", os.Getenv("ENV")) // Debug: Print the current environment
+	fmt.Println("Current ENV:", os.Getenv("ENV"))
 	if os.Getenv("ENV") != "production" {
 		err := godotenv.Load()
 		if err != nil {
