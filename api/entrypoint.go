@@ -1,7 +1,9 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 	initialzers "youtravel-api/api/initializers"
 	"youtravel-api/api/routes"
 
@@ -12,7 +14,14 @@ var (
 	app *gin.Engine
 )
 
+func PrintAllEnvVariables() {
+	for _, env := range os.Environ() {
+		fmt.Println(env) // Prints "key=value"
+	}
+}
+
 func init() {
+	PrintAllEnvVariables()
 
 	initialzers.LoadEnvVariables()
 
