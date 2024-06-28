@@ -5,8 +5,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"gorm.io/gorm"
 	"net/http"
-	initialzers "youtravel-api/api/initializers"
+	initializers "youtravel-api/api/initializers"
 	"youtravel-api/api/routes"
 
 	"github.com/gin-gonic/gin"
@@ -50,26 +51,45 @@ func ImageUpload(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully uploaded file"})
 }
 
+func dropTravelData(db *gorm.DB) error {
+	// Using GORM to delete all records from the travel table
+	result := db.Exec("DELETE FROM travel")
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
 func init() {
+	initializers.LoadEnvVariables()
 
-	initialzers.LoadEnvVariables()
+	// Initialize database connection with GORM
+	initializers.ConnectToDB() // Assuming this function handles errors internally
 
-	initialzers.ConnectToDB()
-	initialzers.SyncDatabase()
-	initialzers.InitCategories(initialzers.DB)
-	initialzers.InitLocationCategories(initialzers.DB)
+	// Optionally synchronize database schema
+	initializers.SyncDatabase() // Assuming this function also handles errors internally
 
+	// Attempt to drop travel data, handle error if one occurs
+	if err := dropTravelData(initializers.DB); err != nil {
+		panic(err) // Handle error according to your error handling policy
+	}
+
+	// Initialize other database-related configurations
+	initializers.InitCategories(initializers.DB)
+	initializers.InitLocationCategories(initializers.DB)
+
+	// Set up the Gin application
 	app = gin.New()
 	r := app.Group("/api")
 
-	//routes
+	// Set up API routes
 	routes.UserRoutes(r)
 	routes.TravelRoutes(r)
 	routes.InviteRoutes(r)
 	routes.CategoriesRoutes(r)
 	routes.LocationRoutes(r)
 
-	//image
+	// Image upload and retrieval endpoints
 	r.GET("/image", func(c *gin.Context) {
 		c.File("index.html")
 	})
