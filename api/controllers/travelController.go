@@ -53,7 +53,7 @@ func CreateTravel(c *gin.Context) {
 		Description string `json:"description"`
 		Date        string `json:"date"`
 		Rating      string `json:"rating"`
-		PhotoURL    string `json:"photo_url"`
+		Photo       string `json:"photo"`
 	}
 
 	if err := c.BindJSON(&body); err != nil {
