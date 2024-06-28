@@ -181,6 +181,14 @@ func GetTravelsByUserId(c *gin.Context) {
 	}
 
 	var travelDTOs []dto.TravelDTO
+
+	for _, p := range participations {
+		// Skip processing any travel records where ID is 0 just in case
+		if p.Travel.ID == 0 {
+			continue
+		}
+	}
+
 	for _, p := range participations {
 		travelDTOs = append(travelDTOs, dto.TravelDTO{
 			ID:          p.Travel.ID,
