@@ -13,4 +13,5 @@ func TravelRoutes(r *gin.RouterGroup) {
 	r.GET("/travelByRating", controllers.GetTravelsByRating)
 	r.GET("/userTravel/:userId", controllers.GetTravelsByUserId)
 	r.DELETE("travel/:id", controllers.DeleteTravel)
+	r.GET("/travelImage/:id", controllers.GetTravelImage)
 }

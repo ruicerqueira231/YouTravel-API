@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -211,4 +212,51 @@ func DeleteTravel(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Travel deleted successfully"})
+}
+
+func GetTravelImage(c *gin.Context) {
+	travelID := c.Param("id")
+	if travelID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing travel ID"})
+		return
+	}
+
+	var travel models.Travel
+	result := initialzers.DB.First(&travel, travelID)
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Travel not found"})
+		return
+	}
+
+	if travel.Photo == "" {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No photo available for this travel"})
+		return
+	}
+
+	cfg, err := config.LoadDefaultConfig(context.TODO())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load AWS config"})
+		return
+	}
+
+	client := s3.NewFromConfig(cfg)
+	bucket := "you-travel-storage"
+	key := travel.Photo
+
+	resp, err := client.GetObject(context.TODO(), &s3.GetObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to retrieve file from S3: %v", err)})
+		return
+	}
+	defer resp.Body.Close()
+
+	contentType := "application/octet-stream"
+	if resp.ContentType != nil {
+		contentType = *resp.ContentType
+	}
+
+	c.DataFromReader(http.StatusOK, *resp.ContentLength, contentType, resp.Body, nil)
 }
