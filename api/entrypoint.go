@@ -60,6 +60,15 @@ func dropTravelData(db *gorm.DB) error {
 	return nil
 }
 
+func dropUserData(db *gorm.DB) error {
+	// Using GORM to delete all records from the travel table
+	result := db.Exec("DELETE FROM users")
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
 func init() {
 	initializers.LoadEnvVariables()
 
@@ -68,6 +77,10 @@ func init() {
 
 	// Optionally synchronize database schema
 	initializers.SyncDatabase() // Assuming this function also handles errors internally
+
+	if err := dropUserData(initializers.DB); err != nil {
+		panic(err) // Handle error according to your error handling policy
+	}
 
 	// Attempt to drop travel data, handle error if one occurs
 	if err := dropTravelData(initializers.DB); err != nil {
