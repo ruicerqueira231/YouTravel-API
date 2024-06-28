@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"youtravel-api/api/dto"
 	initialzers "youtravel-api/api/initializers"
 	"youtravel-api/api/models"
 )
@@ -155,11 +156,9 @@ func GetAllUsers(c *gin.Context) {
 }
 
 func GetUserById(c *gin.Context) {
-
 	id := c.Param("id")
 
 	var user models.User
-
 	if err := initialzers.DB.First(&user, id).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusNotFound, gin.H{
@@ -167,13 +166,20 @@ func GetUserById(c *gin.Context) {
 			})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "Failed to fech user",
+				"error": "Failed to fetch user",
 			})
 		}
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	userDTO := dto.UserDTO{
+		ID:       user.ID,
+		Nome:     user.Nome,
+		Username: user.Username,
+		Photo:    user.Photo,
+	}
+
+	c.JSON(http.StatusOK, userDTO)
 }
 
 func GetUserByEmail(c *gin.Context) {

@@ -190,7 +190,7 @@ func GetTravelsByUserId(c *gin.Context) {
 			Description: p.Travel.Description,
 			Date:        p.Travel.Date,
 			Rating:      p.Travel.Rating,
-			Category:    p.Travel.Category.Description,
+			PhotoURL:    p.Travel.Photo,
 		})
 	}
 
