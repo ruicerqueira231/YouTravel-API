@@ -69,7 +69,7 @@ func CreateTravel(c *gin.Context) {
 		Description: body.Description,
 		Date:        body.Date,
 		Rating:      body.Rating,
-		Photo:       body.PhotoURL,
+		Photo:       body.Photo,
 	}
 
 	if err := initialzers.DB.Create(&travel).Error; err != nil {
