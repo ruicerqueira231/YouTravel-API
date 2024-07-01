@@ -46,13 +46,10 @@ func ImageUpload(c *gin.Context) {
 		return
 	}
 
-	// Success response
-	c.JSON(http.StatusOK, gin.H{"message": "Successfully uploaded file"})
+	c.JSON(http.StatusOK, gin.H{"message": "Successfully uploaded file", "filename": key})
 }
 
 func init() {
-	initializers.LoadEnvVariables()
-
 	initializers.ConnectToDB()
 
 	initializers.SyncDatabase()
@@ -63,17 +60,12 @@ func init() {
 	app = gin.New()
 	r := app.Group("/api")
 
-	// Set up API routes
 	routes.UserRoutes(r)
 	routes.TravelRoutes(r)
 	routes.InviteRoutes(r)
 	routes.CategoriesRoutes(r)
 	routes.LocationRoutes(r)
 
-	// Image upload and retrieval endpoints
-	r.GET("/image", func(c *gin.Context) {
-		c.File("index.html")
-	})
 	r.POST("/upload", ImageUpload)
 }
 

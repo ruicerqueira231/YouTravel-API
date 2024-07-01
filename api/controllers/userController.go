@@ -176,6 +176,7 @@ func GetUserById(c *gin.Context) {
 		ID:       user.ID,
 		Nome:     user.Nome,
 		Username: user.Username,
+		Password: user.Password,
 		Photo:    user.Photo,
 	}
 
