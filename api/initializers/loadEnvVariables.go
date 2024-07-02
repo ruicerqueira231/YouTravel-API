@@ -12,13 +12,18 @@ func LoadEnvVariables() {
 	cwd, _ := os.Getwd()
 	fmt.Println("Current working directory:", cwd)
 
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+	env := os.Getenv("ENV")
+	if env != "production" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatalf("Error loading .env file: %v", err)
+		} else {
+			fmt.Println(".env file loaded successfully")
+		}
 	} else {
-		fmt.Println(".env file loaded successfully")
+		fmt.Println("Running in production environment, not loading .env file.")
 	}
 
-	env := os.Getenv("ENV")
+	env = os.Getenv("ENV")
 	fmt.Println("Current ENV:", env)
 }
