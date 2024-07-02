@@ -19,6 +19,7 @@ func ConnectToDB() {
 	if env == "local" {
 		dsn = buildLocalDSN()
 	} else {
+		env = "production"
 		dsn = buildRemoteDSN()
 	}
 
