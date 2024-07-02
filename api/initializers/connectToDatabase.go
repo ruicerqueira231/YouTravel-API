@@ -41,11 +41,11 @@ func buildLocalDSN() string {
 }
 
 func buildRemoteDSN() string {
-	host := os.Getenv("REMOTE_POSTGRES_HOST")
-	user := os.Getenv("REMOTE_POSTGRES_USER")
-	password := os.Getenv("REMOTE_POSTGRES_PASSWORD")
-	dbname := os.Getenv("REMOTE_POSTGRES_DB")
-	port := os.Getenv("REMOTE_POSTGRES_PORT")
-	sslmode := os.Getenv("REMOTE_POSTGRES_SSLMODE")
+	host := os.Getenv("POSTGRES_HOST")
+	user := os.Getenv("POSTGRES_USER")
+	password := os.Getenv("POSTGRES_PASSWORD")
+	dbname := os.Getenv("POSTGRES_DB")
+	port := os.Getenv("POSTGRES_PORT")
+	sslmode := os.Getenv("POSTGRES_SSLMODE")
 	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=UTC", host, user, password, dbname, port, sslmode)
 }
