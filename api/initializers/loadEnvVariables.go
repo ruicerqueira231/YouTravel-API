@@ -13,6 +13,7 @@ func LoadEnvVariables() {
 	fmt.Println("Current working directory:", cwd)
 
 	env := os.Getenv("ENV")
+	fmt.Println("Current ENV:", env)
 	if env != "production" {
 		err := godotenv.Load()
 		if err != nil {
@@ -23,7 +24,4 @@ func LoadEnvVariables() {
 	} else {
 		fmt.Println("Running in production environment, not loading .env file.")
 	}
-
-	env = os.Getenv("ENV")
-	fmt.Println("Current ENV:", env)
 }
