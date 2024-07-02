@@ -42,6 +42,30 @@ func buildLocalDSN() string {
 }
 
 func buildRemoteDSN() string {
+	host := os.Getenv("POSTGRES_HOST")
+	if host == "" {
+		host = "ep-small-fire-a202x97i-pooler.eu-central-1.aws.neon.tech"
+	}
+	user := os.Getenv("POSTGRES_USER")
+	if user == "" {
+		host = "default"
+	}
+	password := os.Getenv("POSTGRES_PASSWORD")
+	if password == "" {
+		password = "kZJGLz6Xwl4d"
+	}
+	dbname := os.Getenv("POSTGRES_DATABASE")
+	if dbname == "" {
+		dbname = "verceldb"
+	}
+	port := os.Getenv("POSTGRES_PORT")
+	if port == "" {
+		port = "5432"
+	}
+	sslmode := os.Getenv("POSTGRES_SSLMODE")
+	if sslmode == "" {
+		sslmode = "require"
+	}
 	return fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=UTC",
 		os.Getenv("POSTGRES_HOST"), os.Getenv("POSTGRES_USER"),
