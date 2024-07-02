@@ -50,9 +50,6 @@ func ImageUpload(c *gin.Context) {
 }
 
 func init() {
-
-	initializers.LoadEnvVariables()
-
 	initializers.ConnectToDB()
 
 	initializers.SyncDatabase()
