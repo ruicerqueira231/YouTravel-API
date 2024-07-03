@@ -8,42 +8,12 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"log"
 	"net/http"
 	"youtravel-api/api/dto"
 	initialzers "youtravel-api/api/initializers"
 	"youtravel-api/api/models"
 )
-
-func ImageUpload(c *gin.Context) {
-	cfg, err := config.LoadDefaultConfig(context.TODO())
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to load AWS config"})
-		return
-	}
-
-	client := s3.NewFromConfig(cfg)
-
-	file, header, err := c.Request.FormFile("fileUpload")
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "file retrieval error"})
-		return
-	}
-	defer file.Close()
-
-	bucket := "you-travel-storage"
-	key := header.Filename
-
-	_, err = client.PutObject(context.TODO(), &s3.PutObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(key),
-		Body:   file,
-		ACL:    "public-read",
-	})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to upload to S3"})
-		return
-	}
-}
 
 func CreateTravel(c *gin.Context) {
 
@@ -68,7 +38,6 @@ func CreateTravel(c *gin.Context) {
 		CategoryID:  body.CategoryID,
 		Title:       body.Title,
 		Description: body.Description,
-		Date:        body.Date,
 		Rating:      body.Rating,
 		Photo:       body.Photo,
 	}
@@ -104,20 +73,24 @@ func GetAllTravels(c *gin.Context) {
 		return
 	}
 
-	// converte travel em DTOs
+	for _, t := range travels {
+		log.Printf("Travel: %v, User: %v\n\n", t.Title, t.User)
+	}
+
 	travelDTOs := make([]dto.TravelDTO, len(travels))
 	for i, t := range travels {
 		travelDTOs[i] = dto.TravelDTO{
 			ID:          t.ID,
-			UserIDAdmin: t.UserIDAdmin,
-			CategoryID:  t.CategoryID,
 			Title:       t.Title,
 			Description: t.Description,
 			Date:        t.Date,
+			PhotoURL:    t.Photo,
 			Rating:      t.Rating,
-			Category:    t.Category.Description}
+			Category:    t.Category.Description,
+			User:        t.User.Nome,
+			UserPhoto:   t.User.Photo,
+		}
 	}
-
 	c.JSON(http.StatusOK, travelDTOs)
 }
 
@@ -136,16 +109,16 @@ func GetTravelById(c *gin.Context) {
 		}
 	}
 
-	// Convert the travel model to DTO
 	travelDTO := dto.TravelDTO{
 		ID:          travel.ID,
-		UserIDAdmin: travel.UserIDAdmin,
-		CategoryID:  travel.CategoryID,
 		Title:       travel.Title,
 		Description: travel.Description,
 		Date:        travel.Date,
+		PhotoURL:    travel.Photo,
 		Rating:      travel.Rating,
 		Category:    travel.Category.Description,
+		User:        travel.User.Nome,
+		UserPhoto:   travel.User.Photo,
 	}
 
 	c.JSON(http.StatusOK, travelDTO)
@@ -170,39 +143,35 @@ func GetTravelsByRating(c *gin.Context) {
 }
 
 func GetTravelsByUserId(c *gin.Context) {
-	userId := c.Param("userId")
+	userId := c.Param("id")
 	var participations []models.Participation
 
-	// Find all participations for the user
-	result := initialzers.DB.Where("user_id = ?", userId).Preload("Travel").Find(&participations)
+	result := initialzers.DB.Where("user_id = ?", userId).
+		Preload("Travel").
+		Preload("Travel.User").
+		Preload("Travel.Category").
+		Find(&participations)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch participations"})
 		return
 	}
 
-	var travelDTOs []dto.TravelDTO
+	var travelDTO []dto.TravelDTO
 
 	for _, p := range participations {
-		// Skip processing any travel records where ID is 0 just in case
-		if p.Travel.ID == 0 {
-			continue
-		}
-	}
-
-	for _, p := range participations {
-		travelDTOs = append(travelDTOs, dto.TravelDTO{
+		travelDTO = append(travelDTO, dto.TravelDTO{
 			ID:          p.Travel.ID,
-			UserIDAdmin: p.Travel.UserIDAdmin,
-			CategoryID:  p.Travel.CategoryID,
 			Title:       p.Travel.Title,
 			Description: p.Travel.Description,
 			Date:        p.Travel.Date,
-			Rating:      p.Travel.Rating,
 			PhotoURL:    p.Travel.Photo,
+			Rating:      p.Travel.Rating,
+			Category:    p.Travel.Category.Description,
+			User:        p.Travel.User.Nome,
+			UserPhoto:   p.Travel.User.Photo,
 		})
 	}
-
-	c.JSON(http.StatusOK, travelDTOs)
+	c.JSON(http.StatusOK, travelDTO)
 }
 
 func DeleteTravel(c *gin.Context) {

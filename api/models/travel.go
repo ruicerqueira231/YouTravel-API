@@ -1,6 +1,9 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+	"time"
+)
 
 type Travel struct {
 	gorm.Model
@@ -8,7 +11,7 @@ type Travel struct {
 	CategoryID    uint
 	Title         string
 	Description   string
-	Date          string
+	Date          time.Time
 	Rating        string
 	Photo         string
 	User          User            `gorm:"foreignKey:UserIDAdmin;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`

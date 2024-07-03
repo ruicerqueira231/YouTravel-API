@@ -240,6 +240,61 @@ func GetUserByUsername(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
+func UpdateUserImage(c *gin.Context) {
+	userID := c.Param("id")
+
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing user ID"})
+		return
+	}
+
+	var user models.User
+	result := initialzers.DB.First(&user, userID)
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	cfg, err := config.LoadDefaultConfig(context.TODO())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to load AWS config"})
+		return
+	}
+
+	client := s3.NewFromConfig(cfg)
+
+	file, header, err := c.Request.FormFile("fileUpload")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "file retrieval error"})
+		return
+	}
+	defer file.Close()
+
+	bucket := "you-travel-storage"
+	key := fmt.Sprintf("user_%d_%s", userID, header.Filename)
+
+	_, err = client.PutObject(context.TODO(), &s3.PutObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+		Body:   file,
+		ACL:    "public-read",
+	})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to upload to S3"})
+		return
+	}
+
+	user.Photo = key
+
+	if dbResult := initialzers.DB.Save(&user); dbResult.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update user photo"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Successfully uploaded file", "filename": key})
+}
+
 func UpdateUser(c *gin.Context) {
 	userID := c.Param("id")
 	if userID == "" {
