@@ -2,12 +2,10 @@ package api
 
 import (
 	"context"
-	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"net/http"
-	"os"
 	initializers "youtravel-api/api/initializers"
 	"youtravel-api/api/routes"
 
@@ -52,14 +50,6 @@ func ImageUpload(c *gin.Context) {
 }
 
 func init() {
-
-	env := os.Getenv("ENV")
-	if env == "" {
-		env = "production"
-		fmt.Println("Running in %s environment", env)
-	} else {
-		fmt.Println("Running in %s environment", env)
-	}
 
 	initializers.ConnectToDB()
 
