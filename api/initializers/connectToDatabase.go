@@ -19,8 +19,8 @@ func ConnectToDB() {
 	if env == "local" {
 		dsn = buildLocalDSN()
 	} else {
-
 		env = "production"
+		fmt.Println(env)
 		dsn = buildRemoteDSN()
 	}
 
